@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 # Import from your twitter_bot.py file
-from twitter_bot import (
+from agent.twitter_bot import (
     browser_launcher,
     run_bot_session,
     main_bot_loop,

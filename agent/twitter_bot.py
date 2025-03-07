@@ -53,7 +53,7 @@ async def browser_launcher() -> str:
     try:
         print("launched the browser")
         playwright = await async_playwright().start()
-        browser = await playwright.chromium.launch(headless=False)
+        browser = await playwright.chromium.launch(headless=True)
         context = await browser.new_context()
         page = await context.new_page()
         await page.goto("https://x.com/login", wait_until="domcontentloaded")

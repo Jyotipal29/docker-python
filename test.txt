@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.11.6-bullseye
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Set environment variables
 ENV PYTHONFAULTHANDLER=1 \
@@ -15,31 +15,23 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Set the working directory to /app
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies for Playwright
-RUN apt-get update && apt-get install -y \
-    curl \
-    unzip \
-    xvfb \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libxcomposite1 \
-    libxrandr2 \
-    libgbm1 \
-    libxkbcommon0 \
-    libgtk-3-0
-
-# Install Poetry and project dependencies
-# RUN echo "3.11.0" > .python-version
-# RUN pip install uv
-RUN uv python install 3.11 
+# Install Poetry
+# Install pip requirements
+RUN echo "3.11.6" > .python-version
+RUN pip install uv
 COPY pyproject.toml uv.lock ./
 RUN touch .python-version
 RUN uv sync --frozen
 RUN uv add setuptools
-RUN  uv run playwright install --with-deps
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
@@ -47,4 +39,4 @@ COPY . /app
 EXPOSE 8000
 
 # Define the command to run your application
-CMD ["uv","run","uvicorn", "agent.api:app", "--host" ,"0.0.0.0", "--port", "8000"]
+CMD ["uv","run","uvicorn", "app.main:app", "--host" ,"0.0.0.0", "--port", "10000"]
